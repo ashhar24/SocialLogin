@@ -1,13 +1,17 @@
-package com.defoliate.sociallogin;
+package com.defoliate.sociallogin.google;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.defoliate.sociallogin.MainActivity;
+import com.defoliate.sociallogin.R;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -22,44 +26,45 @@ import com.google.android.gms.common.api.Status;
 /**
  * Created by defoliate on 25-11-2015.
  */
-public class SignInActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener
+public class SignInFragment extends Fragment implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener
 {
-    private static final String TAG = "SignInActivity";
+    private static final String TAG = "SignInFragment";
     private static final int RC_SIGN_IN = 9001;
 
     private GoogleApiClient mGoogleApiClient;
     private TextView mStatusTextView;
     private ProgressDialog mProgressDialog;
+    private View view;
 
     @Override
-    protected void onCreate (Bundle savedInstanceState)
+    public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_signin);
+        view = inflater.inflate(R.layout.fragment_google_signin, container, false);
 
         // Views
-        mStatusTextView = (TextView) findViewById(R.id.status);
+        //mStatusTextView = (TextView) view.findViewById(R.id.status);
 
         // Button listeners
-        findViewById(R.id.sign_in_button).setOnClickListener(this);
-        findViewById(R.id.sign_out_button).setOnClickListener(this);
-        findViewById(R.id.disconnect_button).setOnClickListener(this);
+        view.findViewById(R.id.sign_in_button).setOnClickListener(this);
+        view.findViewById(R.id.sign_out_button).setOnClickListener(this);
+        view.findViewById(R.id.disconnect_button).setOnClickListener(this);
 
         // Configure sign-in to request the user's ID, email address, and basic profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
 
         // Build a GoogleApiClient with access to the Google Sign-In API and the options specified by gso.
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+        mGoogleApiClient = new GoogleApiClient.Builder(view.getContext())
+                .enableAutoManage(getActivity() /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
         // Customize sign-in button. The sign-in button can be displayed in multiple sizes and color schemes. It can also be contextually
         // rendered based on the requested scopes. For example. a red button may be displayed when Google+ scopes are requested, but a white button
         // may be displayed when only basic profile is requested. Try adding the Scopes.PLUS_LOGIN scope to the GoogleSignInOptions to see the difference.
-        SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
+        SignInButton signInButton = (SignInButton) view.findViewById(R.id.sign_in_button);
         signInButton.setSize(SignInButton.SIZE_STANDARD);
         signInButton.setScopes(gso.getScopeArray());
+        return view;
     }
 
     @Override
@@ -112,7 +117,7 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
         {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
-            mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
+            //mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
             updateUI(true);
         }
         else
@@ -122,12 +127,14 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
         }
     }
 
-    private void signIn() {
+    private void signIn ()
+    {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
-    private void signOut() {
+    private void signOut ()
+    {
         Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
                 new ResultCallback<Status>()
                 {
@@ -141,7 +148,8 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
                 });
     }
 
-    private void revokeAccess() {
+    private void revokeAccess ()
+    {
         Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(
                 new ResultCallback<Status>()
                 {
@@ -158,7 +166,8 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
     @Override
     public void onClick (View v)
     {
-        switch (v.getId()) {
+        switch(v.getId())
+        {
             case R.id.sign_in_button:
                 signIn();
                 break;
@@ -179,9 +188,11 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
     }
 
-    private void showProgressDialog() {
-        if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(this);
+    private void showProgressDialog ()
+    {
+        if(mProgressDialog == null)
+        {
+            mProgressDialog = new ProgressDialog(getContext());
             mProgressDialog.setMessage(getString(R.string.loading));
             mProgressDialog.setIndeterminate(true);
         }
@@ -189,21 +200,26 @@ public class SignInActivity extends AppCompatActivity implements GoogleApiClient
         mProgressDialog.show();
     }
 
-    private void hideProgressDialog() {
-        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+    private void hideProgressDialog ()
+    {
+        if(mProgressDialog != null && mProgressDialog.isShowing())
+        {
             mProgressDialog.hide();
         }
     }
 
-    private void updateUI(boolean signedIn) {
-        if (signedIn) {
-            findViewById(R.id.sign_in_button).setVisibility(View.GONE);
-            findViewById(R.id.sign_out_and_disconnect).setVisibility(View.VISIBLE);
-        } else {
-            mStatusTextView.setText(R.string.signed_out);
-
-            findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
-            findViewById(R.id.sign_out_and_disconnect).setVisibility(View.GONE);
+    private void updateUI (boolean signedIn)
+    {
+        if(signedIn)
+        {
+            view.findViewById(R.id.sign_in_button).setVisibility(View.GONE);
+            view.findViewById(R.id.sign_out_and_disconnect).setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            //mStatusTextView.setText(R.string.signed_out);
+            view.findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
+            view.findViewById(R.id.sign_out_and_disconnect).setVisibility(View.GONE);
         }
     }
 }
