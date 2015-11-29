@@ -1,6 +1,5 @@
 package com.defoliate.sociallogin;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -18,6 +17,7 @@ public class MainActivity extends FragmentActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         SignInFragment googlesigninfragment = new SignInFragment();
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();

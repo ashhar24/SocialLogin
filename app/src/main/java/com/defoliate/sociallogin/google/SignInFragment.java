@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.defoliate.sociallogin.MainActivity;
 import com.defoliate.sociallogin.R;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -32,7 +31,6 @@ public class SignInFragment extends Fragment implements GoogleApiClient.OnConnec
     private static final int RC_SIGN_IN = 9001;
 
     private GoogleApiClient mGoogleApiClient;
-    private TextView mStatusTextView;
     private ProgressDialog mProgressDialog;
     private View view;
 
@@ -41,8 +39,6 @@ public class SignInFragment extends Fragment implements GoogleApiClient.OnConnec
     {
         view = inflater.inflate(R.layout.fragment_google_signin, container, false);
 
-        // Views
-        //mStatusTextView = (TextView) view.findViewById(R.id.status);
 
         // Button listeners
         view.findViewById(R.id.sign_in_button).setOnClickListener(this);
@@ -117,7 +113,7 @@ public class SignInFragment extends Fragment implements GoogleApiClient.OnConnec
         {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
-            //mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
+            ((TextView) getActivity().findViewById(R.id.status)).setText("Sign in from Google Account - " + acct.getDisplayName());
             updateUI(true);
         }
         else
@@ -217,7 +213,7 @@ public class SignInFragment extends Fragment implements GoogleApiClient.OnConnec
         }
         else
         {
-            //mStatusTextView.setText(R.string.signed_out);
+            ((TextView) getActivity().findViewById(R.id.status)).setText("Signed Out");
             view.findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
             view.findViewById(R.id.sign_out_and_disconnect).setVisibility(View.GONE);
         }
